@@ -2,6 +2,8 @@
 # Created by https://www.toptal.com/developers/gitignore/api/python
 # Edit at https://www.toptal.com/developers/gitignore?templates=python
 
+# osx .DS_Store
+.DS_Store
 
 # Other Project related file extension
 *.aux.xml
