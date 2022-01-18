@@ -24,11 +24,10 @@ This repository contains small collection of scripts that can be used to:
 
      python convert_shp_to_raster.py './data/input/Indus.dir/Indus.shp'  --res=0.5
 
-.. _figure:
-.. figure:: data/output/Indus/Indus.jpeg
+
+.. image:: data/output/Indus/Indus.jpeg
    :width: 25 em
    :align: center
-   :alt: convert_shp_to_raster.py
 
 \
 \
