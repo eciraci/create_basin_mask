@@ -33,7 +33,7 @@ This repository contains small collection of scripts that can be used to:
 
 .. raw:: html
     <p align="center">
-      <img src="https://github.com/waldyr/Sublime-Installer/blob/master/sublime_text.png?raw=true" alt="Sublime's custom image"/>
+      <img src="data/output/Indus/Indus.jpeg" alt="convert_shp_to_raster.py"/>
     </p>
 
 
