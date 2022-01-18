@@ -28,6 +28,14 @@ This repository contains small collection of scripts that can be used to:
 .. image:: data/output/Indus/Indus.jpeg
    :width: 25 em
    :align: center
+\
+\
+
+.. raw:: html
+    <p align="center">
+      <img src="https://github.com/waldyr/Sublime-Installer/blob/master/sublime_text.png?raw=true" alt="Sublime's custom image"/>
+    </p>
+
 
 \
 \
