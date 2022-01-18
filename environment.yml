@@ -1,0 +1,20 @@
+name: create_basin_mask
+channels:
+  - conda-forge
+dependencies:
+  - cartopy
+  - gdal
+  - matplotlib
+  - netCDF4
+  - numpy
+  - pip
+  - pyproj
+  - python>=3.8
+  - pyyaml
+  - scipy
+  - setuptools_scm
+  - pandas
+  - geopandas
+  - rasterio
+  - pip:
+     - git+https://github.com/ppinard/matplotlib-scalebar.git
