@@ -36,7 +36,7 @@ PYTHON DEPENDENCIES:
     pandas: Python Data Analysis Library
            https://pandas.pydata.org
     geopandas: Python tools for geographic data
-           https://pandas.pydata.org
+           https://geopandas.org/en/stable/
     rasterio: access to geospatial raster data
            https://rasterio.readthedocs.io
     fiona: Fiona reads and writes geographic data files.
