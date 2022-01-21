@@ -50,4 +50,6 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
 
       - name: Run tests
-        run: python preliminary_tset.py
+        run: |
+          conda activate my-env
+          python preliminary_tset.py
