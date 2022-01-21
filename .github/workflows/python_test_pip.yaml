@@ -1,31 +1,54 @@
-# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
-
-name: Python package using Pip
+# - Alternative conda installation
+name: ci
 
 on:
   push:
     branches: [ dev ]
 
+env:
+  CACHE_NUMBER: 0  # increase to reset cache manually
+
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  build-linux:
     strategy:
       matrix:
-        python-version: [3.8]
+        include:
+          - os: ubuntu-latest
+            label: linux-64
+            prefix: /usr/share/miniconda3/envs/my-env
+            python-version: 3.7
+
+          - os: ubuntu-latest
+            label: linux-64b
+            prefix: /usr/share/miniconda3/envs/my-env
+            python-version: 3.8
+
+    name: ${{ matrix.label }}
+    runs-on: ${{ matrix.os }}
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      uses: BSFishy/pip-action@v1
-      with:
-        requirements: requirements.txt
-        packages: cartopy==v0.19.0.post1
-#    - name: Install dependencies
-#      run: |
-#        pip install --upgrade pip
-#        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-#        python -m  pip install cartopy==v0.19.0.post1 || exit 1
+      - uses: actions/checkout@v2
+      - name: Setup Mambaforge
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+            miniforge-variant: Mambaforge
+            miniforge-version: latest
+            activate-environment: my-env
+            use-mamba: true
+            python-version: ${{ matrix.python-version }}
+
+      - name: Set cache date
+        run: echo "DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
+
+      - uses: actions/cache@v2
+        with:
+          path: ${{ matrix.prefix }}
+          key: ${{ matrix.label }}-conda-${{ hashFiles('environment.yml') }}-${{ env.DATE }}-${{ env.CACHE_NUMBER }}
+        id: cache
+
+      - name: Update environment
+        run: mamba env update -n my-env -f environment.yml
+        if: steps.cache.outputs.cache-hit != 'true'
+
+#      - name: Run tests
+#        shell: bash -l {0}
+#        run: pytest ./tests
