@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: [3.8]
@@ -20,7 +20,12 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
-      run: |
-        pip install --upgrade pip
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-        pip install cartopy==v0.19.0.post1 || exit 1
+      uses: BSFishy/pip-action@v1
+      with:
+        requirements: requirements.txt
+        packages: cartopy==v0.19.0.post1
+#    - name: Install dependencies
+#      run: |
+#        pip install --upgrade pip
+#        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+#        python -m  pip install cartopy==v0.19.0.post1 || exit 1
