@@ -25,4 +25,5 @@ jobs:
         run: |
           conda env update --file environment.yml --name base
       - name: Run tests
+        shell: bash -l {0}
         run: python preliminary_tset.py
