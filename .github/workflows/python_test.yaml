@@ -26,4 +26,4 @@ jobs:
           conda env update --file environment.yml --name base
       - name: Run tests
         shell: bash -l {0}
-        run: python preliminary_tset.py
+        run: python convert_shp_to_raster.py './data/input/Indus.dir/Indus.shp'  --res=0.5
