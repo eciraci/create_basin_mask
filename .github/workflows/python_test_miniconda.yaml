@@ -57,6 +57,7 @@ jobs:
 
       - name: Commit changes and push if changed
         run: |-
+          git fetch
           git add .
           git diff
           git config user.name 'Github Actions'
