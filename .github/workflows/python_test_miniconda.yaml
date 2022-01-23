@@ -51,4 +51,15 @@ jobs:
 
       - name: Run tests
         shell: bash -l {0}
-        run: python convert_shp_to_raster.py './data/input/Indus.dir/Indus.shp'  --res=0.5
+        run: |
+          python convert_shp_to_raster.py './data/input/Indus.dir/Indus.shp'  --res=0.5
+          python convert_raster_to_shp.py './data/output/shapefile_to_raster/Indus/Indus.tiff'
+
+      - name: Commit changes and push if changed
+        run: |-
+          git add .
+          git diff
+          git config user.name 'Github Actions'
+          git config user.email 'actions@github.com'
+          git commit -m "Update README.md update" -a || echo "No changes to commit"
+          git push
