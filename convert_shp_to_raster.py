@@ -65,8 +65,6 @@ import os
 import argparse
 import numpy as np
 from datetime import datetime
-import rasterio
-from rasterio.transform import Affine
 import xarray as xr
 import geopandas as gpd
 from shapely.geometry import Point
@@ -79,76 +77,13 @@ import matplotlib.patches as mpatches
 from matplotlib_scalebar.scalebar import ScaleBar
 from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
 import matplotlib.ticker as mticker
+# -
+from utility_functions import save_raster, load_tiff
 
 # - Change Default Matplotlib Settings
 plt.rc('font', family='monospace')
 plt.rc('font', weight='bold')
 plt.style.use('seaborn-deep')
-
-
-def save_raster(raster: np.ndarray, res: float, x: np.ndarray,
-                y: np.ndarray, out_path: str, crs: int,
-                nodata: int = -9999) -> None:
-    """
-    Save the Provided Raster in GeoTiff format
-    :param raster: input raster - np.ndarray
-    :param res: raster resolution - integer
-    :param x: x-axis - np.ndarray
-    :param y: y-axis - np.ndarray
-    :param crs: - coordinates reference system
-    :param out_path: absolute path to output file
-    :param nodata: no-data value
-    :return: None
-    """
-    # - Calculate Affine Transformation of the output raster
-    y = np.flipud(y)
-    shift = res/2
-    transform = (Affine.translation(x[0]-shift, y[0]+shift)
-                 * Affine.scale(res, -res))
-    print(transform)
-    with rasterio.open(out_path, 'w', driver='GTiff',
-                       height=raster.shape[0],
-                       width=raster.shape[1], count=1,
-                       dtype=raster.dtype, crs=crs,
-                       transform=transform,
-                       nodata=nodata) as dst:
-        dst.write(raster, 1)
-
-
-def load_tiff(in_path: str) -> dict:
-    """
-    Load TanDEM-X DEM raster saved in GeoTiff format
-    :param in_path: absolute path to input GeoTiff
-    :return: python dictionary containing raster data as numpy array
-             input raster + ancillary data (X- and Y-axes info + Geo-Transform).
-    """
-    with rasterio.open(in_path, mode="r+") as src:
-        # - read band #1 - DEM elevation in meters
-        dem_input = src.read(1).astype(src.dtypes[0])
-        # - raster upper-left and lower-right corners
-        ul_corner = src.transform * (0, 0)
-        lr_corner = src.transform * (src.width, src.height)
-        grid_res = src.res
-        # -
-        shift_x = src.res[0] / 2
-        shift_y = src.res[0] / 2
-        x_coords = np.arange(ul_corner[0]+shift_x, lr_corner[0]+shift_x,
-                             grid_res[0])
-        y_coords = np.arange(lr_corner[1]+shift_y, ul_corner[1]+shift_y,
-                             grid_res[1])
-        if src.transform.e < 0:
-            dem_input = np.flipud(dem_input)
-        # - Compute New Affine Transform
-        transform = (Affine.translation(x_coords[0]+shift_x,
-                                        y_coords[0]-shift_y)
-                     * Affine.scale(src.res[0], src.res[1]))
-
-        return{'data': dem_input, 'crs': src.crs, 'res': src.res,
-               'y_coords': y_coords, 'x_coords': x_coords,
-               'transform': transform, 'src_transform': src.transform,
-               'width': src.width, 'height': src.height,
-               'ul_corner': ul_corner, 'lr_corner': lr_corner,
-               'nodata': src.nodata, 'dtype': src.dtypes[0]}
 
 
 def convert_shp_to_raster(input_data: str, out_dir: str,
@@ -317,9 +252,11 @@ def main():
     args = parser.parse_args()
     # -
     print('# - Input data: {}'.format(args.input_data_path[0]))
+    # - create shp-to-raster directory
+    out_dir = create_dir(args.outdir, 'shapefile_to_raster')
 
     # - Create selected domain binary mask.
-    mask_p = convert_shp_to_raster(args.input_data_path[0], args.outdir,
+    mask_p = convert_shp_to_raster(args.input_data_path[0], out_dir,
                                    args.boundaries, res=args.res,
                                    ref_crs=args.crs, o_type=args.f_type)
 
@@ -389,18 +326,23 @@ def main():
                             edgecolor='r', facecolor='none',
                             linestyle='--')
 
-    # - Plot DH/DT map
+    # - Plot Binary Mask
     im = ax.pcolormesh(xx, yy, mask, cmap=plt.get_cmap('viridis'))
     leg_label_list.append('Binary Mask')
     l2 = mpatches.Rectangle((0, 0), 1, 0.1, linewidth=2,
                             edgecolor='y', facecolor='y',
                             linestyle='-')
 
-    # - Add Legend to Melt Rate Maps
+    # - Add Legend to Mao
     ax.legend([l1, l2], leg_label_list, loc='upper right',
               fontsize=10, framealpha=1,
               facecolor='w', edgecolor='k')
 
+    # - Add Datetime Annotation
+    ax.annotate('Last Update: {}'.format(datetime.now().isoformat()),
+                xy=(0.03, 0.03), xycoords="axes fraction",
+                size=7, zorder=100,
+                bbox=dict(boxstyle="square", fc="w", alpha=0.8))
     # - save output figure
     fig_format = 'jpeg'
     plt.savefig(mask_p['output_file'].replace(f_out_type, fig_format),
