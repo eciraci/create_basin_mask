@@ -79,7 +79,7 @@ jobs:
           miniforge-version: latest
           activate-environment: my-env
           use-mamba: true
-          python-version: ${{ python-version }}
+          python-version: ${{ matrix.python-version }}
 
       - name: Set cache date
         run: echo "DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
