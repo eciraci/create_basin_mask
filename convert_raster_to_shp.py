@@ -59,23 +59,22 @@ from __future__ import print_function
 import os
 import sys
 import argparse
-import numpy as np
 from datetime import datetime
+import numpy as np
 import rasterio
 from rasterio import features
 import fiona
 import fiona.crs
 import geopandas as gpd
-from utility_functions import create_dir
 import cartopy.crs as ccrs
 from cartopy.io.shapereader import Reader
 from cartopy.feature import ShapelyFeature
+from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
-from matplotlib_scalebar.scalebar import ScaleBar
-from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
 import matplotlib.ticker as mticker
-from utility_functions import load_tiff, load_netcdf
+from matplotlib_scalebar.scalebar import ScaleBar
+from utility_functions import load_tiff, load_netcdf, create_dir
 
 # - Change Default Matplotlib Settings
 plt.rc('font', family='monospace')
@@ -103,7 +102,7 @@ def convert_raster_to_shapefile(input_data: str, out_dir: str) -> str:
 
     # - Import Raster Data
     if f_suff.lower() in ['tif', 'tiff', 'geotiff']:
-        with rasterio.open(input_data, mode="r+") as src:
+        with rasterio.open(input_data, mode='r+') as src:
             # - read band #1
             m_arr = src.read(1, masked=True)
             crs = src.crs
@@ -150,7 +149,7 @@ def convert_raster_to_shapefile(input_data: str, out_dir: str) -> str:
         # - polygons. Use only the polygon with the maximum number
         # - of points to delineate the area covered by valid elevation
         # - data.
-        poly_vect_len = list()
+        poly_vect_len = []
         for shp_bound_tmp in b_shapes:
             poly_vect_len.append(len(shp_bound_tmp[0]
                                      ['coordinates'][0]))
@@ -186,7 +185,7 @@ def main():
 
     args = parser.parse_args()
     # -
-    print('# - Input data: {}'.format(args.input_data_path[0]))
+    print(f'# - Input data: {args.input_data_path[0]}')
 
     # - create raster-to-shp directory
     out_dir = create_dir(args.outdir, 'raster_to_shapefile')
@@ -210,7 +209,7 @@ def main():
     mask = ev_mask['data']  # - binary mask as numpy array
     x_coords = ev_mask['x_coords']  # - x-axis
     y_coords = ev_mask['y_coords']  # - y-axes
-    xx, yy = np.meshgrid(x_coords, y_coords)  # - mask domain mesh-grid
+    xx_m, yy_m = np.meshgrid(x_coords, y_coords)  # - mask domain mesh-grid
 
     # - Read Input Shapefile with GeoPandas.
     gdz_df = gpd.read_file(mask_p)
@@ -223,29 +222,29 @@ def main():
     # - Compare the obtained binary mask with input shapefile.
     fig = plt.figure(figsize=(7, 5), constrained_layout=True)
     # - initialize legend labels
-    leg_label_list = list()
+    leg_label_list = []
     ax = fig.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
     ax.set_extent(map_extent, crs=ccrs.PlateCarree())
     # - Figure title
     ax.set_title('Raster -> Shapefile', weight='bold', loc='left', size=12)
     ax.coastlines()  # - plot coast lines
     # - Set Map Grid
-    gl = ax.gridlines(draw_labels=True, dms=True, x_inline=False,
-                      y_inline=False, color='k', linestyle='dotted',
-                      alpha=0.3)
-    gl.top_labels = False
-    gl.bottom_labels = True
-    gl.right_labels = False
-    gl.xlocator \
+    grid_ln = ax.gridlines(draw_labels=True, dms=True, x_inline=False,
+                           y_inline=False, color='k', linestyle='dotted',
+                           alpha=0.3)
+    grid_ln.top_labels = False
+    grid_ln.bottom_labels = True
+    grid_ln.right_labels = False
+    grid_ln.xlocator \
         = mticker.FixedLocator(np.arange(np.floor(map_extent[0]) - 3,
                                          np.floor(map_extent[1]) + 3, 5))
-    gl.ylocator \
+    grid_ln.ylocator \
         = mticker.FixedLocator(np.arange(np.floor(map_extent[2]) - 5,
                                          np.floor(map_extent[3]) + 5, 5))
-    gl.xlabel_style = {'rotation': 0, 'weight': 'bold', 'size': 11}
-    gl.ylabel_style = {'rotation': 0, 'weight': 'bold', 'size': 11}
-    gl.xformatter = LONGITUDE_FORMATTER
-    gl.yformatter = LATITUDE_FORMATTER
+    grid_ln.xlabel_style = {'rotation': 0, 'weight': 'bold', 'size': 11}
+    grid_ln.ylabel_style = {'rotation': 0, 'weight': 'bold', 'size': 11}
+    grid_ln.xformatter = LONGITUDE_FORMATTER
+    grid_ln.yformatter = LATITUDE_FORMATTER
 
     if gdz_df.crs.to_string() == 'EPSG:4326':
         # - Add ScaleBar only if working in geographic coordinates
@@ -261,26 +260,26 @@ def main():
                    edgecolor='g', linestyle='--',
                    linewidth=2)
     leg_label_list.append('Output Basin Boundaries')
-    l1 = mpatches.Rectangle((0, 0), 1, 0.1, linewidth=2,
-                            edgecolor='g', facecolor='none',
-                            linestyle='--')
+    leg_1 = mpatches.Rectangle((0, 0), 1, 0.1, linewidth=2,
+                               edgecolor='g', facecolor='none',
+                               linestyle='--')
 
     # - Plot Binary Mask
-    im = ax.pcolormesh(xx, yy, mask, cmap=plt.get_cmap('viridis'))
+    ax.pcolormesh(xx_m, yy_m, mask, cmap=plt.get_cmap('viridis'))
     leg_label_list.append('Input Binary Mask')
-    l2 = mpatches.Rectangle((0, 0), 1, 0.1, linewidth=2,
-                            edgecolor='y', facecolor='y',
-                            linestyle='-')
+    leg_2 = mpatches.Rectangle((0, 0), 1, 0.1, linewidth=2,
+                               edgecolor='y', facecolor='y',
+                               linestyle='-')
 
     # - Add Legend to Map
-    ax.legend([l2, l1], leg_label_list, loc='upper right',
+    ax.legend([leg_2, leg_1], leg_label_list, loc='upper right',
               fontsize=10, framealpha=1,
               facecolor='w', edgecolor='k')
     # - Add Datetime Annotation
-    ax.annotate('Last Update: {}'.format(datetime.now().isoformat()),
-                xy=(0.03, 0.03), xycoords="axes fraction",
+    ax.annotate(f'Last Update: {datetime.now().isoformat()}',
+                xy=(0.03, 0.03), xycoords='axes fraction',
                 size=7, zorder=100,
-                bbox=dict(boxstyle="square", fc="w", alpha=0.8))
+                bbox=dict(boxstyle='square', fc='w', alpha=0.8))
     # - save output figure
     fig_format = 'jpeg'
     plt.savefig(mask_p.replace('shp', fig_format),
@@ -293,4 +292,4 @@ if __name__ == '__main__':
     start_time = datetime.now()
     main()
     end_time = datetime.now()
-    print("# - Computation Time: {}".format(end_time - start_time))
+    print(f'# - Computation Time: {end_time - start_time}')
