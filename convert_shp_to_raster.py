@@ -63,22 +63,21 @@ UPDATE HISTORY:
 from __future__ import print_function
 import os
 import argparse
-import numpy as np
 from datetime import datetime
+import numpy as np
 import xarray as xr
 import geopandas as gpd
 from shapely.geometry import Point
-from utility_functions import create_dir
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+import matplotlib.ticker as mticker
 import cartopy.crs as ccrs
 from cartopy.io.shapereader import Reader
 from cartopy.feature import ShapelyFeature
-import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
-from matplotlib_scalebar.scalebar import ScaleBar
 from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
-import matplotlib.ticker as mticker
+from matplotlib_scalebar.scalebar import ScaleBar
 # -
-from utility_functions import save_raster, load_tiff
+from utility_functions import create_dir, save_raster, load_tiff
 
 # - Change Default Matplotlib Settings
 plt.rc('font', family='monospace')
@@ -114,12 +113,12 @@ def convert_shp_to_raster(input_data: str, out_dir: str,
     x_min = float(domain_bbox[2])
     x_max = float(domain_bbox[3])
 
-    print('# - Selected Coordinate Reference System - EPSG:{}'.format(ref_crs))
+    print(f'# - Selected Coordinate Reference System - EPSG:{ref_crs}')
     print('# - Output Domain Limits: ')
-    print('# - Y-Min: {}'.format(y_min))
-    print('# - Y-Max: {}'.format(y_max))
-    print('# - X-Min: {}'.format(x_min))
-    print('# - X-Max: {}'.format(x_max))
+    print(f'# - Y-Min: {y_min}')
+    print(f'# - Y-Max: {y_max}')
+    print(f'# - X-Min: {x_min}')
+    print(f'# - X-Max: {x_max}')
 
     x_vect = np.arange(x_min, x_max + res, res)
     y_vect = np.arange(y_min, y_max + res, res)
@@ -215,7 +214,7 @@ def convert_shp_to_raster(input_data: str, out_dir: str,
 
 def main():
     parser = argparse.ArgumentParser(
-        description="""- Compute Input Binary Mask at the selected 
+        description="""- Compute Input Binary Mask at the selected
         resolution."""
     )
     parser.add_argument('input_data_path', nargs=1, default=os.getcwd(),
@@ -251,7 +250,7 @@ def main():
 
     args = parser.parse_args()
     # -
-    print('# - Input data: {}'.format(args.input_data_path[0]))
+    print(f'# - Input data: {args.input_data_path[0]}')
     # - create shp-to-raster directory
     out_dir = create_dir(args.outdir, 'shapefile_to_raster')
 
@@ -284,7 +283,7 @@ def main():
     # - Compare the obtained binary mask with input shapefile.
     fig = plt.figure(figsize=(7, 5), constrained_layout=True)
     # - initialize legend labels
-    leg_label_list = list()
+    leg_label_list = []
     ax = fig.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
     ax.set_extent(map_extent, crs=ccrs.PlateCarree())
     # - Figure title
@@ -321,25 +320,25 @@ def main():
     ax.add_feature(shape_feature, facecolor='None',
                    edgecolor='r', linestyle='--',
                    linewidth=2)
-    leg_label_list.append('Basin Boundaries')
-    l1 = mpatches.Rectangle((0, 0), 1, 0.1, linewidth=2,
-                            edgecolor='r', facecolor='none',
-                            linestyle='--')
+    leg_label_list.append('Input Basin Boundaries')
+    l_1 = mpatches.Rectangle((0, 0), 1, 0.1, linewidth=2,
+                             edgecolor='r', facecolor='none',
+                             linestyle='--')
 
     # - Plot Binary Mask
-    im = ax.pcolormesh(xx, yy, mask, cmap=plt.get_cmap('viridis'))
-    leg_label_list.append('Binary Mask')
-    l2 = mpatches.Rectangle((0, 0), 1, 0.1, linewidth=2,
-                            edgecolor='y', facecolor='y',
-                            linestyle='-')
+    ax.pcolormesh(xx, yy, mask, cmap=plt.get_cmap('Greys'))
+    leg_label_list.append('Output Binary Mask')
+    l_2 = mpatches.Rectangle((0, 0), 1, 0.1, linewidth=2,
+                             edgecolor='y', facecolor='y',
+                             linestyle='-')
 
     # - Add Legend to Mao
-    ax.legend([l1, l2], leg_label_list, loc='upper right',
+    ax.legend([l_1, l_2], leg_label_list, loc='upper right',
               fontsize=10, framealpha=1,
               facecolor='w', edgecolor='k')
 
     # - Add Datetime Annotation
-    ax.annotate('Last Update: {}'.format(datetime.now().isoformat()),
+    ax.annotate(f'Last Update: {datetime.now().isoformat()}',
                 xy=(0.03, 0.03), xycoords="axes fraction",
                 size=7, zorder=100,
                 bbox=dict(boxstyle="square", fc="w", alpha=0.8))
@@ -355,4 +354,4 @@ if __name__ == '__main__':
     start_time = datetime.now()
     main()
     end_time = datetime.now()
-    print("# - Computation Time: {}".format(end_time - start_time))
+    print(f"# - Computation Time: {end_time - start_time}")
