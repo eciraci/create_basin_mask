@@ -253,6 +253,13 @@ def main():
                                pad=0.5, box_color='w',
                                frameon=True))
 
+    # - Plot Input Binary Mask
+    ax.pcolormesh(xx_m, yy_m, mask, cmap=plt.get_cmap('viridis'))
+    leg_label_list.append('Input Binary Mask')
+    leg_1 = mpatches.Rectangle((0, 0), 1, 0.1, linewidth=2,
+                               edgecolor='y', facecolor='y',
+                               linestyle='-')
+
     # - Plot Reference Basin Boundaries
     shape_feature = ShapelyFeature(Reader(mask_p).geometries(),
                                    ccrs.PlateCarree())
@@ -260,19 +267,12 @@ def main():
                    edgecolor='g', linestyle='--',
                    linewidth=2)
     leg_label_list.append('Output Basin Boundaries')
-    leg_1 = mpatches.Rectangle((0, 0), 1, 0.1, linewidth=2,
+    leg_2 = mpatches.Rectangle((0, 0), 1, 0.1, linewidth=2,
                                edgecolor='g', facecolor='none',
                                linestyle='--')
 
-    # - Plot Binary Mask
-    ax.pcolormesh(xx_m, yy_m, mask, cmap=plt.get_cmap('viridis'))
-    leg_label_list.append('Input Binary Mask')
-    leg_2 = mpatches.Rectangle((0, 0), 1, 0.1, linewidth=2,
-                               edgecolor='y', facecolor='y',
-                               linestyle='-')
-
     # - Add Legend to Map
-    ax.legend([leg_2, leg_1], leg_label_list, loc='upper right',
+    ax.legend([leg_1, leg_2], leg_label_list, loc='upper right',
               fontsize=10, framealpha=1,
               facecolor='w', edgecolor='k')
     # - Add Datetime Annotation
