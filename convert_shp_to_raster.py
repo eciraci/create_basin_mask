@@ -274,7 +274,7 @@ def main():
     xx, yy = np.meshgrid(x_coords, y_coords)      # - mask domain mesh-grid
     f_out_type = mask_p['f_out_type']             # - output mask file format
     shp_bounds = mask_p['shp_bounds'].values[0]   # - Reference shapefile bounds
-    mask_crs = mask_p['gdz_df_inter'].crs
+    # - mask_crs = mask_p['gdz_df_inter'].crs     # - Uncomment if needed
 
     # - Define output figure extent from input mask bounding box.
     map_extent = [np.floor(shp_bounds[0])-10, np.ceil(shp_bounds[2])+10,

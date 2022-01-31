@@ -17,5 +17,6 @@ dependencies:
   - geopandas
   - rasterio
   - xarray
+  - flake8
   - pip:
      - git+https://github.com/ppinard/matplotlib-scalebar.git
