@@ -253,7 +253,7 @@ def main():
     print(f'# - Input data: {args.input_data_path[0]}')
     # - create shp-to-raster directory
     out_dir = create_dir(args.outdir, 'shapefile_to_raster')
-
+    
     # - Create selected domain binary mask.
     mask_p = convert_shp_to_raster(args.input_data_path[0], out_dir,
                                    args.boundaries, res=args.res,

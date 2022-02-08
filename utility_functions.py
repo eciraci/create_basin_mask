@@ -16,6 +16,7 @@ Python Dependencies:
 """
 # - python dependencies
 from __future__ import print_function
+import os
 import numpy as np
 import rasterio
 from rasterio.transform import Affine
@@ -29,7 +30,6 @@ def create_dir(abs_path: str, dir_name: str) -> str:
     :param dir_name: new directory name
     :return: absolute path to the new directory
     """
-    import os
     dir_to_create = os.path.join(abs_path, dir_name)
     if not os.path.exists(dir_to_create):
         os.mkdir(dir_to_create)
