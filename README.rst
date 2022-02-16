@@ -12,8 +12,8 @@ Create Basin Binary Mask
 
 This repository contains small collection of scripts that can be used to:
 
-1. Compute the binary mask of a basin from its boundaries provided as a esri shapefile.
-2. Extract the boundaries o basin from its raster binary mask.
+1. Compute the binary mask of a basin from its boundaries provided as an esri shapefile.
+2. Extract the boundaries of a basin from its raster binary mask.
 
 \
 \
