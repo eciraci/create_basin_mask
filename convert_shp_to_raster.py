@@ -122,9 +122,9 @@ def convert_shp_to_raster(input_data: str, out_dir: str,
 
     x_vect = np.arange(x_min, x_max + res, res)
     y_vect = np.arange(y_min, y_max + res, res)
-    xx, yy = np.meshgrid(x_vect, y_vect)
-    xx_flat = xx.ravel()
-    yy_flat = yy.ravel()
+    xx_m, yy_m = np.meshgrid(x_vect, y_vect)
+    xx_flat = xx_m.ravel()
+    yy_flat = yy_m.ravel()
 
     # - Find intersection between Domain Grid Point and
     # - Input basin boundaries using GeoPandas Spatial Join.
@@ -142,7 +142,7 @@ def convert_shp_to_raster(input_data: str, out_dir: str,
     out_yy = np.array(yy_flat)[ind_int]
 
     # - Initialize Output Binary Maks
-    out_bin_mask = np.zeros(xx.shape)
+    out_bin_mask = np.zeros(xx_m.shape)
     for k in range(0, len(out_yy)):
         out_bin_mask[np.where(y_vect == out_yy[k]),
                      np.where(x_vect == out_xx[k])] = 1.
@@ -157,27 +157,27 @@ def convert_shp_to_raster(input_data: str, out_dir: str,
             # - is used, name the x and y axes, longitude and latitude.
             dset_mask = xr.Dataset(data_vars=dict(
                 mask=(["y", "x"], out_bin_mask)),
-                coords=dict(lat=(["y", "x"], yy),
-                            lon=(["y", "x"], xx))
+                coords=dict(lat=(["y", "x"], yy_m),
+                            lon=(["y", "x"], xx_m))
             )
 
             dset_mask['lon'].attrs['units'] = 'degree east'
             dset_mask['lon'].attrs['long_name'] = 'Longitude'
-            dset_mask['lon'].attrs['actual_range'] = [np.min(xx), np.max(xx)]
+            dset_mask['lon'].attrs['actual_range'] = [np.min(xx_m), np.max(xx_m)]
             dset_mask['lon'].attrs['standard_name'] = 'longitude'
             dset_mask['lon'].attrs['coordinate_defines'] = 'point'
 
             dset_mask['lat'].attrs['units'] = 'degree north'
             dset_mask['lat'].attrs['long_name'] = 'Latitude'
-            dset_mask['lat'].attrs['actual_range'] = [np.min(yy), np.max(yy)]
+            dset_mask['lat'].attrs['actual_range'] = [np.min(yy_m), np.max(yy_m)]
             dset_mask['lat'].attrs['standard_name'] = 'latitude'
             dset_mask['lat'].attrs['coordinate_defines'] = 'point'
 
         else:
             dset_mask = xr.Dataset(data_vars=dict(
                 mask=(["y", "x"], out_bin_mask)),
-                coords=dict(north=(["y", "x"], yy),
-                            east=(["y", "x"], xx))
+                coords=dict(north=(["y", "x"], yy_m),
+                            east=(["y", "x"], xx_m))
             )
 
         dset_mask.attrs['EPSG'] = ref_crs
@@ -253,7 +253,7 @@ def main():
     print(f'# - Input data: {args.input_data_path[0]}')
     # - create shp-to-raster directory
     out_dir = create_dir(args.outdir, 'shapefile_to_raster')
-    
+
     # - Create selected domain binary mask.
     mask_p = convert_shp_to_raster(args.input_data_path[0], out_dir,
                                    args.boundaries, res=args.res,
@@ -271,12 +271,16 @@ def main():
         x_coords = mask_p['x_coords']
         y_coords = mask_p['y_coords']
 
-    xx, yy = np.meshgrid(x_coords, y_coords)      # - mask domain mesh-grid
+    xx_m, yy_m = np.meshgrid(x_coords, y_coords)      # - mask domain mesh-grid
     f_out_type = mask_p['f_out_type']             # - output mask file format
     shp_bounds = mask_p['shp_bounds'].values[0]   # - Reference shapefile bounds
     # - mask_crs = mask_p['gdz_df_inter'].crs     # - Uncomment if needed
 
     # - Define output figure extent from input mask bounding box.
+    if (shp_bounds[2] <= shp_bounds[0]) or (shp_bounds[3] <= shp_bounds[1]):
+        raise ValueError('Provide mask domain bounding box as '
+                         'Y-Min,Y-Max,X-Min,X-Max')
+
     map_extent = [np.floor(shp_bounds[0])-10, np.ceil(shp_bounds[2])+10,
                   np.floor(shp_bounds[1])-10, np.ceil(shp_bounds[3])+10]
 
@@ -284,15 +288,15 @@ def main():
     fig = plt.figure(figsize=(7, 5), constrained_layout=True)
     # - initialize legend labels
     leg_label_list = []
-    ax = fig.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
-    ax.set_extent(map_extent, crs=ccrs.PlateCarree())
+    ax_f = fig.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
+    ax_f.set_extent(map_extent, crs=ccrs.PlateCarree())
     # - Figure title
-    ax.set_title('Shapefile -> Raster', weight='bold', loc='left', size=12)
-    ax.coastlines()     # - plot coast lines
+    ax_f.set_title('Shapefile -> Raster', weight='bold', loc='left', size=12)
+    ax_f.coastlines()     # - plot coast lines
     # - Set Map Grid
-    gl = ax.gridlines(draw_labels=True, dms=True, x_inline=False,
-                      y_inline=False, color='k', linestyle='dotted',
-                      alpha=0.3)
+    gl = ax_f.gridlines(draw_labels=True, dms=True, x_inline=False,
+                        y_inline=False, color='k', linestyle='dotted',
+                        alpha=0.3)
     gl.top_labels = False
     gl.bottom_labels = True
     gl.right_labels = False
@@ -309,39 +313,39 @@ def main():
 
     if args.crs == 4326:
         # - Add ScaleBar only if working in geographic coordinates
-        ax.add_artist(ScaleBar(1, units='deg', dimension='angle',
-                               location='lower right', border_pad=1,
-                               pad=0.5, box_color='w',
-                               frameon=True))
+        ax_f.add_artist(ScaleBar(1, units='deg', dimension='angle',
+                                 location='lower right', border_pad=1,
+                                 pad=0.5, box_color='w',
+                                 frameon=True))
 
     # - Plot Reference Basin Boundaries
     shape_feature = ShapelyFeature(Reader(args.input_data_path[0]).geometries(),
                                    ccrs.PlateCarree())
-    ax.add_feature(shape_feature, facecolor='None',
-                   edgecolor='r', linestyle='--',
-                   linewidth=2)
+    ax_f.add_feature(shape_feature, facecolor='None',
+                     edgecolor='r', linestyle='--',
+                     linewidth=2)
     leg_label_list.append('Input Basin Boundaries')
     l_1 = mpatches.Rectangle((0, 0), 1, 0.1, linewidth=2,
                              edgecolor='r', facecolor='none',
                              linestyle='--')
 
     # - Plot Binary Mask
-    ax.pcolormesh(xx, yy, mask, cmap=plt.get_cmap('Greys'))
+    ax_f.pcolormesh(xx_m, yy_m, mask, cmap=plt.get_cmap('Greys'))
     leg_label_list.append('Output Binary Mask')
     l_2 = mpatches.Rectangle((0, 0), 1, 0.1, linewidth=2,
                              edgecolor='y', facecolor='y',
                              linestyle='-')
 
     # - Add Legend to Mao
-    ax.legend([l_1, l_2], leg_label_list, loc='upper right',
-              fontsize=10, framealpha=1,
-              facecolor='w', edgecolor='k')
+    ax_f.legend([l_1, l_2], leg_label_list, loc='upper right',
+                fontsize=10, framealpha=1,
+                facecolor='w', edgecolor='k')
 
     # - Add Datetime Annotation
-    ax.annotate(f'Last Update: {datetime.now().isoformat()}',
-                xy=(0.03, 0.03), xycoords="axes fraction",
-                size=7, zorder=100,
-                bbox=dict(boxstyle="square", fc="w", alpha=0.8))
+    ax_f.annotate(f'Last Update: {datetime.now().isoformat()}',
+                  xy=(0.03, 0.03), xycoords="axes fraction",
+                  size=7, zorder=100,
+                  bbox=dict(boxstyle="square", fc="w", alpha=0.8))
     # - save output figure
     fig_format = 'jpeg'
     plt.savefig(mask_p['output_file'].replace(f_out_type, fig_format),
