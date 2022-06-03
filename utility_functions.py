@@ -30,6 +30,8 @@ def create_dir(abs_path: str, dir_name: str) -> str:
     :param dir_name: new directory name
     :return: absolute path to the new directory
     """
+    if not os.path.isdir(abs_path):
+        raise FileNotFoundError("Output Parent Directory not found: {abs_path}")
     dir_to_create = os.path.join(abs_path, dir_name)
     if not os.path.exists(dir_to_create):
         os.mkdir(dir_to_create)
