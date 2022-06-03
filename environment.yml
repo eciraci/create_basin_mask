@@ -13,7 +13,7 @@ dependencies:
   - scipy
   - setuptools_scm
   - pandas
-  - geopandas
+  - geopandas=0.10.2
   - rasterio
   - xarray
   - flake8
