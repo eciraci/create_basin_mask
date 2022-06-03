@@ -13,15 +13,20 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-latest
-            label: linux-64
-            prefix: /usr/share/miniconda3/envs/my-env
-            python-version: 3.7
+#          - os: ubuntu-latest
+#            label: linux-64
+#            prefix: /usr/share/miniconda3/envs/my-env
+#            python-version: 3.8
+#
+#          - os: ubuntu-latest
+#            label: linux-64b
+#            prefix: /usr/share/miniconda3/envs/my-env
+#            python-version: 3.9
 
           - os: ubuntu-latest
             label: linux-64b
             prefix: /usr/share/miniconda3/envs/my-env
-            python-version: 3.8
+            python-version: 3.10
 
     name: ${{ matrix.label }}
     runs-on: ${{ matrix.os }}
@@ -57,11 +62,12 @@ jobs:
           # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
-      - name: Run tests
+      - name: Run Unit test with pytest
         shell: bash -l {0}
         run: |
-          python convert_shp_to_raster.py './data/input/Indus.dir/Indus.shp'  --res=0.5
-          python convert_raster_to_shp.py './data/output/shapefile_to_raster/Indus/Indus.tiff'
+          pytest
+#          python convert_shp_to_raster.py './data/input/Indus.dir/Indus.shp'  --res=0.5
+#          python convert_raster_to_shp.py './data/output/shapefile_to_raster/Indus/Indus.tiff'
 
 
   build-linux-commit:

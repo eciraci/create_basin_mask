@@ -4,7 +4,7 @@ Create Basin Binary Mask
 |Language|
 |License|
 
-.. |Language| image:: https://img.shields.io/badge/python-v3.8-green.svg
+.. |Language| image:: https://img.shields.io/badge/python%20-3.7%2C%203.8%2C%203.9-brightgreen?style=plastic
    :target: https://www.python.org/
 
 .. |License| image:: https://img.shields.io/badge/license-MIT-green.svg
@@ -17,6 +17,18 @@ This repository contains small collection of scripts that can be used to:
 
 \
 \
+
+**Installation**:
+
+1. Setup minimal **conda** installation using  `Miniconda <https://docs.conda.io/en/latest/miniconda.html>`_
+2. Create Python Virtual Environment
+
+    - Creating an environment with commands (`Link <https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-with-commands>`_);
+    - Creating an environment from an environment.yml file (`Link <https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file>`_);
+
+\
+\
+
 
 **Examples**:
 

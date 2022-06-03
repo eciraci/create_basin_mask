@@ -74,6 +74,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import matplotlib.ticker as mticker
 from matplotlib_scalebar.scalebar import ScaleBar
+from pydantic import validate_arguments
 from utility_functions import load_tiff, load_netcdf, create_dir
 
 # - Change Default Matplotlib Settings
@@ -82,6 +83,7 @@ plt.rc('font', weight='bold')
 plt.style.use('seaborn-deep')
 
 
+@validate_arguments()
 def convert_raster_to_shapefile(input_data: str, out_dir: str) -> str:
     """
     Compute Borders of the input binary mask provided as GeoTiff/NetCDF file
