@@ -19,5 +19,6 @@ dependencies:
   - flake8
   - pytest
   - pydantic
+  - pytest-cov
   - pip:
      - git+https://github.com/ppinard/matplotlib-scalebar.git

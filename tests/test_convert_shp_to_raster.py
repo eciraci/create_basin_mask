@@ -13,16 +13,16 @@ data_path = './data/input/Indus.dir/Indus.shp'
 out_dir = os.path.join(os.getcwd(), 'data', 'output', 'shapefile_to_raster')
 
 
-def test_conversion_shp_to_raster():
+def test_conversion_shp_to_raster() -> None:
     mask = convert_shp_to_raster(data_path, out_dir, '-90,90,-180,180')
     assert isinstance(mask, dict)
 
 
-def test_dtype_conversion_to_raster():
+def test_dtype_conversion_to_raster() -> None:
     with pytest.raises(IndexError):
         convert_shp_to_raster(data_path, out_dir, 1)
 
 
-def test_valid_path():
+def test_valid_path() -> None:
     with pytest.raises(FileNotFoundError):
         convert_shp_to_raster(data_path, 1, '-90,90,-180,180')
