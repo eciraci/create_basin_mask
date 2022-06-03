@@ -9,14 +9,15 @@ dependencies:
   - numpy
   - pip
   - pyproj
-  - python>=3.7
   - pyyaml
   - scipy
   - setuptools_scm
   - pandas
-  - geopandas
+  - geopandas=0.10.2
   - rasterio
   - xarray
   - flake8
+  - pytest
+  - pydantic
   - pip:
      - git+https://github.com/ppinard/matplotlib-scalebar.git

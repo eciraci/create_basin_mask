@@ -76,6 +76,7 @@ from cartopy.io.shapereader import Reader
 from cartopy.feature import ShapelyFeature
 from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
 from matplotlib_scalebar.scalebar import ScaleBar
+from pydantic import validate_arguments
 # -
 from utility_functions import create_dir, save_raster, load_tiff
 
@@ -85,6 +86,7 @@ plt.rc('font', weight='bold')
 plt.style.use('seaborn-deep')
 
 
+@validate_arguments()
 def convert_shp_to_raster(input_data: str, out_dir: str,
                           boundaries: str, res: float = 0.5,
                           ref_crs: int = 4326, o_type='nc') -> dict:

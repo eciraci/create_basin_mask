@@ -4,10 +4,12 @@
 
 # osx .DS_Store
 .DS_Store
+#  pycharm style files
+.idea
+.idea/
 
 # Other Project related file extension
 *.aux.xml
-.DS_Store
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
