@@ -9,7 +9,6 @@ dependencies:
   - numpy
   - pip
   - pyproj
-  - python>=3.8
   - pyyaml
   - scipy
   - setuptools_scm

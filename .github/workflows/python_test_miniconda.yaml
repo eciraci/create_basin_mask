@@ -24,7 +24,7 @@ jobs:
 #            python-version: 3.9
 
           - os: ubuntu-latest
-            label: linux-64b
+            label: linux-64c
             prefix: /usr/share/miniconda3/envs/my-env
             python-version: 3.10
 

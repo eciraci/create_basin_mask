@@ -15,7 +15,7 @@ out_dir = os.path.join(os.getcwd(), 'data', 'output', 'shapefile_to_raster')
 
 def test_conversion_shp_to_raster():
     mask = convert_shp_to_raster(data_path, out_dir, '-90,90,-180,180')
-    assert(mask, dict)
+    assert isinstance(mask, dict)
 
 
 def test_dtype_conversion_to_raster():

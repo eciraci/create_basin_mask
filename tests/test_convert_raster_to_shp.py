@@ -16,7 +16,7 @@ out_dir = os.path.join(os.getcwd(), 'data', 'output', 'raster_to_shapefile')
 
 def test_conversion_shp_to_raster():
     mask = convert_raster_to_shapefile(data_path, out_dir)
-    assert(mask, str)
+    assert isinstance(mask, str)
 
 
 def test_valid_path():
