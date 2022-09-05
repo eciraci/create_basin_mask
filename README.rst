@@ -47,7 +47,7 @@ This repository contains small collection of scripts that can be used to:
 
 2. Conversion from raster binary mask to  shapefile boundaries:
 
-     python convert_raster_to_shp.py './data/output/shapefile_to_raster/Indus.tiff'
+     python convert_raster_to_shp.py './data/output/shapefile_to_raster/Indus/Indus.tiff'
 
 .. image:: data/output/raster_to_shapefile/Indus/Indus.jpeg
    :width: 50%
