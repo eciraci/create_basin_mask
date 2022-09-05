@@ -2,7 +2,7 @@
 u"""
 test_convert_raster_to_shp.py
 Written by Enrico Ciraci' (06/2022)
-Preliminary testo of test_convert_raster_to_shp.py
+Preliminary test of test_convert_raster_to_shp.py
 """
 import os
 import pytest

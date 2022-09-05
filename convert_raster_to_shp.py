@@ -115,7 +115,7 @@ def convert_raster_to_shapefile(input_data: str, out_dir: str) -> str:
     elif f_suff.lower() in ['nc', 'netcdf']:
         src = load_netcdf(input_data, data_name='mask', x='lon', y='lat')
         m_arr = src['data']
-        crs = fiona.crs.from_epsg(4326)
+        crs = fiona.crs.from_epsg('EPSG:4326')
         d_transform = src['transform']
         width = src['width']
         height = src['height']
@@ -135,7 +135,7 @@ def convert_raster_to_shapefile(input_data: str, out_dir: str) -> str:
     }
 
     with fiona.open(out_f_name, mode='w', driver='ESRI Shapefile',
-                    schema=schema, crs=crs) as poly_shp:
+                    schema=schema, crs=crs.to_string()) as poly_shp:
         # - generate valid data binary mask
         # - valid data - msk = 1
         # - not valid data - msk = 0

@@ -165,13 +165,15 @@ def convert_shp_to_raster(input_data: str, out_dir: str,
 
             dset_mask['lon'].attrs['units'] = 'degree east'
             dset_mask['lon'].attrs['long_name'] = 'Longitude'
-            dset_mask['lon'].attrs['actual_range'] = [np.min(xx_m), np.max(xx_m)]
+            dset_mask['lon'].attrs['actual_range'] \
+                = [np.min(xx_m), np.max(xx_m)]
             dset_mask['lon'].attrs['standard_name'] = 'longitude'
             dset_mask['lon'].attrs['coordinate_defines'] = 'point'
 
             dset_mask['lat'].attrs['units'] = 'degree north'
             dset_mask['lat'].attrs['long_name'] = 'Latitude'
-            dset_mask['lat'].attrs['actual_range'] = [np.min(yy_m), np.max(yy_m)]
+            dset_mask['lat'].attrs['actual_range'] \
+                = [np.min(yy_m), np.max(yy_m)]
             dset_mask['lat'].attrs['standard_name'] = 'latitude'
             dset_mask['lat'].attrs['coordinate_defines'] = 'point'
 

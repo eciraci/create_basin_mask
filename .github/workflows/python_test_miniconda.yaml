@@ -6,7 +6,7 @@ on:
     branches: [ dev ]
 
 env:
-  CACHE_NUMBER: 4  # increase to reset cache manually
+  CACHE_NUMBER: 5  # increase to reset cache manually
 
 jobs:
   build-linux:
@@ -16,12 +16,12 @@ jobs:
           - os: ubuntu-latest
             label: linux-64
             prefix: /usr/share/miniconda3/envs/my-env
-            python-version: 3.8
-
-          - os: ubuntu-latest
-            label: linux-64b
-            prefix: /usr/share/miniconda3/envs/my-env
             python-version: 3.9
+
+#          - os: ubuntu-latest
+#            label: linux-64b
+#            prefix: /usr/share/miniconda3/envs/my-env
+#            python-version: 3.9
 
     name: ${{ matrix.label }}
     runs-on: ${{ matrix.os }}
@@ -72,7 +72,7 @@ jobs:
           - os: ubuntu-latest
             label: linux-64
             prefix: /usr/share/miniconda3/envs/my-env
-            python-version: 3.8
+            python-version: 3.9
 
     name: ${{ matrix.label }}
     runs-on: ${{ matrix.os }}
